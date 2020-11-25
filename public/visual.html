@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Visualizar</title>
+  </head>
+  <body> 
+    <img id="play" src="" width="100" alt="" />
+    <div id="logger"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var io = io();
+
+      io.on('stream', (image) => {
+        var img = document.getElementById('play');
+        img.src = image;
+        document.getElementById('logger').text = image;
+      })
+    </script>
+  </body>
+</html>

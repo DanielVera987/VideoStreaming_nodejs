@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang='es'>
+  <head>
+    <meta charset='utf-8' />
+    <title>Emicion</title>
+  </head>
+  <body>
+    <video src="" id="video" style="width: 700px;height: 350px" autoplay="true"></video>
+
+    <canvas style="display: none;" id="contenedor"></canvas>
+    <div id="logger"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      const canvas = document.getElementById('contenedor');
+      const context = canvas.getContext('2d');
+      canvas.width = 900;
+      canvas.height = 700;
+      context.width = canvas.width;
+      context.height = canvas.height;
+      let video = document.getElementById('video');
+      var io = io();
+
+      function logger(msj) {
+        document.getElementById('logger').text = msj;
+      }
+
+      function loadCamera(stream){
+        try{
+          video.srcObject = stream;
+        }catch(err){
+          video.src = URL.createObjectURL(stream);
+        }
+        logger('Camara conecatada');
+      }
+
+      function loadFail(){
+        logger('Camara no conectada');
+      }
+
+      function viewVideo(video,context){
+        context.drawImage(video,0,0,context.width,context.height);
+        io.emit('stream',canvas.toDataURL('image/webp'));
+        }
+        (function(){
+          navigator.getUserMedia = ( navigator.getUserMedia ||
+          navigator.webkitGetUserMedia ||
+          navigator.mozGetUserMedia ||
+          navigator.msgGetUserMedia );
+          if(navigator.getUserMedia){
+            navigator.getUserMedia({video: true, audio: false},loadCamera,loadFail);
+          }
+          setInterval(function(){
+            viewVideo(video,context);
+          },1000);
+        })();
+    </script>
+  </body>
+</html>
